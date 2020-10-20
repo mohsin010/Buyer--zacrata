@@ -1,0 +1,14 @@
+.hide{
+    visibility: hidden ;
+    
+    /* background-color: red; */
+}
+.view{
+    margin-bottom: 10px;
+}
+.recp{
+    height: 80px;
+    margin-bottom: 5px;
+    /* width: 20px; */
+    /* background-color: red; */
+}

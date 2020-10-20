@@ -1,0 +1,73 @@
+.hidden {
+    display: none !important;
+}
+
+.picture {
+    margin: 0.6%;
+    height: 90px;
+    width: 10%;
+    min-width: 70px;
+    background-color: transparent;
+    position: relative;
+    display: flex;
+    border-radius: 8px;
+    /* padding: 3px; */
+}
+
+.picture img {
+    /* width: 99%; */
+    border-radius: 8px;
+    min-width: 70px;
+}
+
+.flexcontainer {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    min-width: 500px;
+    /* width: 90%; */
+    padding-right: 2%;
+    /* margin: 0 auto; */
+    /* max-width: 500px; */
+    /* justify-content: center; */
+}
+
+.btn {
+    /* margin-left: 25%;
+    margin-top: 2.8%; */
+    position: absolute;
+    right: 0;
+    margin-top: 30px;
+}
+
+.btn button a:hover {
+    text-decoration: none;
+}
+
+.tbl {
+    /* background-color: blue; */
+    height: 100px;
+    /* color: red; */
+    font-family: sans-serif;
+    color: rgb(97, 93, 93);
+    font-weight: bolder;
+}
+
+.tbldiv {
+    /* background-color: red; */
+    width: 30%;
+    min-width: 300px;
+    /* position: relative; */
+    /* padding-top: 5px; */
+}
+
+.link {
+    text-decoration: none !important;
+}
+
+@media screen and (max-width: 500px) {
+    .btn {
+        position: relative;
+        margin-left: 10%;
+    }
+}

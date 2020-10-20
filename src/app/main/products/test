@@ -1,0 +1,503 @@
+import FuseAnimate from '@fuse/core/FuseAnimate';
+import { useForm } from '@fuse/hooks';
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
+import { darken } from '@material-ui/core/styles/colorManipulator';
+import Typography from '@material-ui/core/Typography';
+import clsx from 'clsx';
+import React, { useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { Map, GoogleApiWrapper, Marker, InfoWindow } from 'google-maps-react';
+import { withStyles } from '@material-ui/core';
+import PropTypes from 'prop-types';
+import compose from 'recompose/compose';
+import TextField from '@material-ui/core/TextField';
+import Autocomplete from '@material-ui/lab/Autocomplete';
+import StorefrontIcon from '@material-ui/icons/Storefront';
+import DriveEtaIcon from '@material-ui/icons/DriveEta';
+import Modal from '@material-ui/core/Modal';
+import AddShoppingCartIcon from '@material-ui/icons/AddShoppingCart';
+
+
+import CardActionArea from '@material-ui/core/CardActionArea';
+import CardActions from '@material-ui/core/CardActions';
+import CardMedia from '@material-ui/core/CardMedia';
+import MenuItem from '@material-ui/core/MenuItem';
+import SearchIcon from '@material-ui/icons/Search';
+import Slider from '@material-ui/core/Slider';
+
+import FuseAnimateGroup from '@fuse/core/FuseAnimateGroup';
+import FusePageSimple from '@fuse/core/FusePageSimple';
+import Button from '@material-ui/core/Button';
+import { blue, green, red } from '@material-ui/core/colors';
+import Icon from '@material-ui/core/Icon';
+import IconButton from '@material-ui/core/IconButton';
+import Input from '@material-ui/core/Input';
+import Paper from '@material-ui/core/Paper';
+import { makeStyles, ThemeProvider, useTheme } from '@material-ui/core/styles';
+import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace';
+import axios from 'axios';
+
+import styles1 from './myStyle.module.css';
+
+import picture from '../../fall-glow-small.jpg'
+
+
+const styles = theme => ({
+    root: {
+        background: `radial-gradient(${darken(theme.palette.primary.dark, 0.5)} 0%, ${theme.palette.primary.dark} 80%)`,
+        color: theme.palette.primary.contrastText
+    },
+
+    highlight: {
+        backgroundColor: 'red',
+    }
+});
+
+
+const overMap = {
+    position: "relative",
+    // top: "90%",
+    // left: "1%",
+    border: "0.1px solid black",
+    borderRadius: "5px",
+    width: "97%",
+    height: "110px",
+    backgroundColor: "rgb(216, 214, 214)"
+
+}
+
+
+
+// const classes = useStyles();
+// function HomePage() {
+class ProductsPage extends React.Component {
+
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            suggestions: [],
+            text: '',
+            currentLocation: {
+                latitude: 31.452136, longitude: 73.070382
+            },
+            picture: picture,
+            zoom: 14,
+            hidden: false,
+            selectedStore: '',
+            quantity: '',
+            cart: [],
+            open: false,
+            setOpen: false,
+            setFilterOpen: false,
+            weight: "1kg",
+            quantities: 1,
+            value: 20,
+            setValue: 37,
+
+            stores: [
+                {
+                    name: "imtiaz",
+                    location: { latitude: 31.452136, longitude: 73.070382 },
+                    data: { picture: picture, address: 'Abdullah pur street 1 38000', miles: '3.8', drive: '30 ' }
+                },
+                {
+                    name: "metro",
+                    location: { latitude: 31.459390, longitude: 73.123221 },
+                    data: { picture: picture, address: 'Abdullah pur street 1 38000', miles: '3.8', drive: '30 ' }
+
+                },
+                {
+                    name: "melano",
+                    location: { latitude: 31.457095, longitude: 73.081730 },
+                    data: { picture: picture, address: 'Abdullah pur street 1 38000', miles: '3.8', drive: '30 ' }
+
+                },
+                {
+                    name: "packages",
+                    location: { latitude: 31.455330, longitude: 73.068183 },
+                    data: { picture: picture, address: 'Abdullah pur street 1 38000', miles: '5.8', drive: '80 ' }
+                },
+                //   {latitude: 47.3084488, longitude: -122.2140121},
+                //   {latitude: 47.5524695, longitude: -122.0425407}
+            ],
+            category: { name: "category1", picture: picture },
+            products: [
+                { name: "product1", price: '10', unit: ['ML', 'KG'], picture: picture, des: "This is a good product for daily use at home office or work space. Customer can us it in resturant" },
+                { name: "product2", price: '10', unit: ['ML', 'KG'], picture: picture, des: "This is a good product for daily use at home office or work space. Customer can us it in resturant" },
+                { name: "product3", price: '10', unit: ['ML', 'KG'], picture: picture, des: "This is a good product for daily use at home office or work space. Customer can us it in resturant" },
+                { name: "product4", price: '10', unit: ['ML', 'KG'], picture: picture, des: "This is a good product for daily use at home office or work space. Customer can us it in resturant" },
+                { name: "product5", price: '10', unit: ['ML', 'KG'], picture: picture, des: "This is a good product for daily use at home office or work space. Customer can us it in resturant" },
+                { name: "product6", price: '10', unit: ['ML', 'KG'], picture: picture, des: "This is a good product for daily use at home office or work space. Customer can us it in resturant" },
+                { name: "product7", price: '10', unit: ['ML', 'KG'], picture: picture, des: "This is a good product for daily use at home office or work space. Customer can us it in resturant" },
+                { name: "product8", price: '10', unit: ['ML', 'KG'], picture: picture, des: "This is a good product for daily use at home office or work space. Customer can us it in resturant" },
+                { name: "product9", price: '10', unit: ['ML', 'KG'], picture: picture, des: "This is a good product for daily use at home office or work space. Customer can us it in resturant" },
+                { name: "product10", price: '10', unit: ['ML', 'KG'], picture: picture, des: "This is a good product for daily use at home office or work space. Customer can us it in resturant" },
+                { name: "product111", price: '10', unit: ['ML', 'KG'], picture: picture, des: "This is a good product for daily use at home office or work space. Customer can us it in resturant" },
+                { name: "product12", price: '10', unit: ['ML', 'KG'], picture: picture, des: "This is a good product for daily use at home office or work space. Customer can us it in resturant" },
+                { name: "product13", price: '10', unit: ['ML', 'KG'], picture: picture, des: "This is a good product for daily use at home office or work space. Customer can us it in resturant" },
+
+            ],
+
+
+        }
+    }
+    quantities = [
+        {
+            value: '1',
+
+        },
+        {
+            value: '2',
+        },
+        {
+            value: '3',
+        },
+        {
+            value: '4',
+        },
+    ];
+    weightes = [
+        {
+            value: 'KG',
+        },
+        {
+            value: 'ML',
+        },
+        {
+            value: 'GM',
+        },
+
+    ];
+
+
+    handlePriceChange = (event, newValue) => {
+        // setValue(newValue);
+        console.log(this.state);
+        this.setState({
+            setValue: newValue
+        })
+        // this.setValue = newValue
+    };
+    onTextChange = (e) => {
+        let value = e.target.textContent;
+        debugger;
+        let suggestions = [];
+        const regex = new RegExp(`^${value}`, 'i');
+        if (value.length > 0) {
+            for (const item of this.state.products) {
+                console.log(item);
+
+                if (item.name.includes(value)) {
+                    suggestions.push(item)
+                    // this.selectedText(item.name)
+                }
+            }
+        }
+        // else {
+        //     this.setState({
+        //         currentLocation: { latitude: this.state.stores[0].location.latitude, longitude: this.state.stores[0].location.longitude },
+        //         zoom: 14,
+        //     })
+        // }
+        console.log(suggestions);
+
+        this.setState(() => ({
+            suggestions,
+            text: value
+        }))
+    }
+    handleFilterOpen = () => {
+        debugger;
+        this.setState({
+            setFilterOpen: true
+        })
+    };
+    handleFilterClose = () => {
+        this.setState({
+            setFilterOpen: false
+        })
+    };
+    valuetext(value) {
+        return `${value}°C`;
+    }
+    handleOpen = () => {
+        debugger;
+        this.setState({
+            setOpen: true
+        })
+    };
+
+    handleClose = () => {
+        this.setState({
+            setOpen: false
+        })
+    };
+    handleWeightChange = (event) => {
+        this.setState({
+            weight: event.target.value
+        });
+    };
+    handleQuantityChange = (event) => {
+        this.setState({
+            weight: event.target.value
+        });
+    }
+
+    classes = this.props
+
+    body = (
+        // <div >
+        //     <h2 id="simple-modal-title">Text in a modal</h2>
+        //     <p id="simple-modal-description">
+        //         Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
+        //   </p>
+        //     {/* <SimpleModal /> */}
+        // </div>
+        <Card className={styles1.abc}>
+            <CardActionArea>
+
+                <div className={styles1.productflex}>
+                    <div>
+                        <h2>Product Details</h2>
+                    </div>
+                    <div className={styles1.closebtn} onClick={this.handleClose} >
+                        X
+                    </div>
+                </div>
+                <CardContent >
+                    <Typography gutterBottom variant="h5" component="h2" className={styles1.modaldes}>
+                        Lizard
+          </Typography>
+                    <CardContent className={styles1.flextest}>
+                        <CardMedia
+                            className={this.classes.media, styles1.modalmedia}
+                            image={picture}
+                            title="Contemplative Reptile"
+                        >
+                            {/* <img src={picture} /> */}
+
+                        </CardMedia>
+                        <Typography variant="body2" color="textSecondary" component="p" className={styles1.modaldes}>
+                            Lizards are a widespread group of squamate reptiles, with over 6,000 species, ranging
+                            across all continents except Antarctica
+          </Typography>
+                    </CardContent>
+                    <Typography variant="body2" color="textSecondary" component="p" className={styles1.modaldes}>
+                        <b> Price: 15 </b>
+                    </Typography>
+                </CardContent>
+            </CardActionArea>
+            <CardActions>
+                <TextField
+                    // id="outlined-select-currency-native"
+                    // select
+                    label="Quantity"
+                    className={styles1.dropdown}
+                    // value={this.state.weight}
+                    onChange={this.handleQuantityChange}
+                    SelectProps={{
+                        native: true,
+                    }}
+                    type='number'
+
+                    // helperText="Please select your currency"
+                    variant="outlined"
+                >
+                    {/* {this.quantities.map((option) => (
+                        <option key={option.value} value={option.value}>
+                            {option.value}
+                        </option>
+                    ))} */}
+                </TextField>
+                <TextField
+                    id="outlined-select-currency-native"
+                    select
+                    label="Weight"
+                    className={styles1.dropdown}
+                    // value={this.state.weight}
+                    onChange={this.handleWeightChange}
+                    SelectProps={{
+                        native: true,
+                    }}
+                    // helperText="Please select your currency"
+                    variant="outlined"
+                >
+                    {this.weightes.map((option) => (
+                        <option key={option.value} value={option.value}>
+                            {option.value}
+                        </option>
+                    ))}
+                </TextField>
+                <Button variant="contained" size="small" color="primary" onClick={this.handleClose} >
+                    <AddShoppingCartIcon /> Add to Cart
+        </Button>
+            </CardActions>
+        </Card>
+    );
+    filterBody = (
+        // <div >
+        //     <h2 id="simple-modal-title">Text in a modal</h2>
+        //     <p id="simple-modal-description">
+        //         Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
+        //   </p>
+        //     {/* <SimpleModal /> */}
+        // </div>
+        <Card className={styles1.abc}>
+            {/* <CardActionArea> */}
+            <div className={styles1.productflex}>
+                <div>
+                    <h2>Filter</h2>
+                </div>
+                <div className={styles1.closebtnfilter} onClick={this.handleFilterClose} >
+                    X
+                    </div>
+            </div>
+            {/* <CardContent > */}
+            <div className={styles1.filtermodalmain}>
+
+                <Typography id="range-slider" className={styles1.pricerange} gutterBottom>
+                    Price Range
+</Typography>
+                <Slider
+                    value={this.value}
+                    onChange={this.handlePriceChange}
+                    valueLabelDisplay="auto"
+                    aria-labelledby="range-slider"
+                    getAriaValueText={this.valuetext}
+                />
+                {/* <CardContent className={styles1.flextest}> */}
+
+                {/* </CardContent> */}
+                {/* <CardActions> */}
+                <Button className={styles1.filterbtn} variant="contained" size="small" color="primary" onClick={this.handleFilterClose}>
+                    <SearchIcon /> Filter
+        </Button>
+            </div>
+            {/* </CardActions> */}
+            {/* </CardContent> */}
+            {/* </CardActionArea> */}
+        </Card>
+    );
+
+
+    render() {
+        const { text, suggestions } = this.state;
+        const { classes } = this.props
+
+
+        return (
+            <div className={classes.root}>
+
+                <div className={'flex flex-col flex-auto flex-shrink-0 items-center justify-center p-32'}>
+                    <div className="flex flex-col items-center justify-center w-full" >
+                        <FuseAnimate animation="transition.expandIn">
+                            <Card className="w-full max-w-500" >
+                                <CardContent className="flex flex-col items-center" style={{ height: "100%" }}>
+                                    <div style={overMap} id="over_map">
+                                        {this.state.stores.map((item) => { //Store Section
+                                            if (item.name == 'imtiaz') { //this condition coresponding value come from previous component
+
+                                                return <div className={styles1.flexcontainer}>
+
+                                                    <div className={styles1.picture}><img src={item.data.picture} /></div>
+                                                    <div className={styles1.tbldiv}>
+                                                        <table className={styles1.tbl}>
+                                                            <tbody>
+                                                                <tr><td>
+
+                                                                    <th>{item.name.toUpperCase()}</th>
+                                                                </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>{item.data.address}</td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>{item.data.miles + " " + "Miles Away"}</td>
+                                                                    <td>< DriveEtaIcon />{item.data.drive + " " + "Min Drive"}</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                    <div className={styles1.btn}>
+                                                        <Button variant="contained" color="primary" >
+                                                            <Link to="/store"> <KeyboardBackspaceIcon />Back to Store </Link>
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            }
+
+                                        })}
+                                    </div>
+                                    <div className={styles1.searchcont}>
+                                        <div className={styles1.search}>
+                                            <Autocomplete
+                                                id="search"
+                                                freeSolo
+                                                onChange={this.onTextChange}
+                                                options={this.state.products.map((option) => option.name)}
+                                                renderInput={(params) => (
+                                                    <TextField {...params} label="Search" margin="normal" variant="outlined" />
+                                                )}
+                                            />
+                                        </div>
+                                        <div>
+                                            <Button variant="contained" color="primary" onClick={this.handleFilterOpen} >Filter</Button>
+                                        </div>
+                                    </div>
+                                    <div className={styles1.heading}>
+                                        <h1 >Products</h1>
+                                    </div>
+                                    <div className={styles1.catcontainer}>
+                                        {this.state.suggestions.length != 0 ? this.state.suggestions.map(item => {
+                                            return <div className={styles1.flexchild}><Link onClick={this.handleOpen}>
+
+                                                <img src={item.picture} /></Link></div>
+
+                                        }) : this.state.products.map(item => {
+                                            return <div className={styles1.flexchild}  ><Link onClick={this.handleOpen}>
+
+                                                <img src={item.picture} /></Link></div>
+
+
+                                        })}
+
+                                    </div>
+                                    <div >
+                                        <Modal
+                                            className={styles1.modal}
+                                            open={this.state.setOpen}
+                                            onClose={this.handleClose}
+                                            aria-labelledby="simple-modal-title"
+                                            aria-describedby="simple-modal-description"
+                                        >
+                                            {this.body}
+                                        </Modal>
+                                    </div>
+                                    {/* filter modal */}
+                                    <div >
+                                        <Modal
+                                            className={styles1.modal}
+                                            open={this.state.setFilterOpen}
+                                            onClose={this.handleFilterClose}
+                                            aria-labelledby="simple-modal-title"
+                                            aria-describedby="simple-modal-description"
+                                        >
+                                            {this.filterBody}
+                                        </Modal>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </FuseAnimate>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+}
+ProductsPage.propTypes = {
+    classes: PropTypes.object.isRequired,
+};
+
+export default withStyles(styles)(ProductsPage);
